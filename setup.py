@@ -23,4 +23,16 @@ setup(
         "aio-pika>=9.0.0",
         "redis>=4.2.0",
     ],
+    extras_require={
+        "dev": [
+            "pytest>=7.0.0",
+            "pytest-asyncio>=0.21.0",
+            "build",
+            "twine",
+        ],
+        "test": [
+            "pytest>=7.0.0",
+            "pytest-asyncio>=0.21.0",
+        ],
+    },
 )

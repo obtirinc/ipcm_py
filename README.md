@@ -10,28 +10,52 @@ A lightweight, asynchronous Inter-Process Communication (IPC) library for Python
 ## **📂 Project Structure**
 
 ```text
-your_project/  
+ipcm_py/  
+│  
+├── .github/  
+│   └── workflows/  
+│       └── publish.yml        # PyPI release automation workflow  
 │  
 ├── ipc_messenger/  
-│   ├── __init__.py      # High-level Orchestrator & RemoteServiceError  
-│   ├── mq_handler.py    # RabbitMQ Logic (via aio-pika)  
-│   └── cache_pubsub.py  # Redis Logic (via redis-py)  
+│   ├── __init__.py            # Package entrypoint & RemoteServiceError  
+│   ├── cache_pubsub.py        # Redis Logic (via redis-py)  
+│   └── mq_handler.py          # RabbitMQ Logic (via aio-pika)  
 │  
-├── service_a.py         # Your Requester Service  
-└── service_b.py         # Your Responder Service
+├── tests/  
+│   ├── conftest.py            # Global Pytest fixtures & CLI options  
+│   ├── test_cache_pubsub.py    # Redis Handler Unit Tests  
+│   ├── test_mq_handler.py      # RabbitMQ Handler Unit Tests  
+│   ├── test_ipc_messenger.py  # IPC Orchestrator Unit Tests  
+│   └── test_integration.py    # Live Broker Integration Tests  
+│  
+├── pyproject.toml             # Build system metadata  
+├── setup.py                   # Package configuration  
+└── README.md                  # Project documentation  
 ```
 
 ---
 
 ## **📋 Prerequisites & Installation**
 
-### **Dependencies**
+### **Installation**
 
-* **aio-pika**: Asynchronous RabbitMQ client.  
-* **redis**: Official Redis Python client (supporting asyncio).
+Install directly from PyPI:
 
 ```bash
-pip install aio-pika redis
+pip install ipc_messenger
+```
+
+### **Core Dependencies**
+
+* **aio-pika**: Asynchronous RabbitMQ client (`>=9.0.0`).  
+* **redis**: Official Redis Python client supporting asyncio (`>=4.2.0`).
+
+### **Development & Test Dependencies**
+
+To run tests or contribute to the project:
+
+```bash
+pip install aio-pika redis pytest pytest-asyncio
 ```
 
 ---
@@ -124,3 +148,25 @@ if __name__ == "__main__":
 
 ### `await start_listening(queue_name, process_callback)`
 * Main consumer listener loop. Automatically routes return values or serialized exceptions back via Redis.
+
+---
+
+## **🧪 Running Tests**
+
+### **1. Unit Tests (Mocked Brokers)**
+
+Run unit tests locally without requiring active RabbitMQ or Redis servers:
+
+```bash
+pytest tests/test_cache_pubsub.py tests/test_mq_handler.py tests/test_ipc_messenger.py -v
+```
+
+### **2. Integration Tests (Live Brokers)**
+
+To run live end-to-end integration tests, specify your broker connection options using CLI arguments:
+
+```bash
+pytest tests/test_integration.py \
+  --rabbitmq-url="amqp://guest:guest@localhost:5672/" \
+  --redis-url="redis://localhost:6379/0" -v
+```
